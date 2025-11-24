@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../../atoms/inputs/o1_otp_digit_field.dart';
 import '../../foundations/themes/semantic_colors.dart';
 
 /// O1 Design System OTP Input Molecule
@@ -220,21 +221,22 @@ class _O1OtpInputState extends State<O1OtpInput> {
 
           // OTP Fields
           Row(
-            mainAxisSize: MainAxisSize.min,
             children: List.generate(widget.length, (index) {
-              return Padding(
-                padding: EdgeInsets.only(
-                  right: index < widget.length - 1 ? 12 : 0,
-                ),
-                child: _OtpDigitField(
-                  controller: _controllers[index],
-                  focusNode: _focusNodes[index],
-                  enabled: widget.enabled,
-                  hasError: widget.hasError || widget.errorText != null,
-                  obscureText: widget.obscureText,
-                  keyboardType: widget.keyboardType,
-                  onChanged: (value) => _handleTextChange(index, value),
-                  onKeyEvent: (event) => _handleKeyEvent(index, event),
+              return Expanded(
+                child: Padding(
+                  padding: EdgeInsets.only(
+                    right: index < widget.length - 1 ? 12 : 0,
+                  ),
+                  child: O1OtpDigitField(
+                    controller: _controllers[index],
+                    focusNode: _focusNodes[index],
+                    enabled: widget.enabled,
+                    hasError: widget.hasError || widget.errorText != null,
+                    obscureText: widget.obscureText,
+                    keyboardType: widget.keyboardType,
+                    onChanged: (value) => _handleTextChange(index, value),
+                    onKeyEvent: (event) => _handleKeyEvent(index, event),
+                  ),
                 ),
               );
             }),
@@ -256,108 +258,6 @@ class _O1OtpInputState extends State<O1OtpInput> {
                     ),
             ),
         ],
-      ),
-    );
-  }
-}
-
-/// Individual OTP digit field
-class _OtpDigitField extends StatelessWidget {
-  final TextEditingController controller;
-  final FocusNode focusNode;
-  final bool enabled;
-  final bool hasError;
-  final bool obscureText;
-  final TextInputType keyboardType;
-  final ValueChanged<String> onChanged;
-  final ValueChanged<KeyEvent> onKeyEvent;
-
-  const _OtpDigitField({
-    required this.controller,
-    required this.focusNode,
-    required this.enabled,
-    required this.hasError,
-    required this.obscureText,
-    required this.keyboardType,
-    required this.onChanged,
-    required this.onKeyEvent,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    // Determine border color based on state
-    Color borderColor;
-    if (!enabled) {
-      borderColor = O1SemanticColors.inputBorderDefault;
-    } else if (hasError) {
-      borderColor = O1SemanticColors.inputBorderError;
-    } else {
-      borderColor = O1SemanticColors.inputBorderDefault;
-    }
-
-    return SizedBox(
-      width: 48,
-      height: 56,
-      child: KeyboardListener(
-        focusNode: FocusNode(),
-        onKeyEvent: onKeyEvent,
-        child: TextField(
-          controller: controller,
-          focusNode: focusNode,
-          enabled: enabled,
-          obscureText: obscureText,
-          keyboardType: keyboardType,
-          textAlign: TextAlign.center,
-          maxLength: 1,
-          style: theme.textTheme.headlineSmall?.copyWith(
-            fontSize: 24,
-            fontWeight: FontWeight.w600,
-          ),
-          inputFormatters: [
-            LengthLimitingTextInputFormatter(1),
-            if (keyboardType == TextInputType.number)
-              FilteringTextInputFormatter.digitsOnly,
-          ],
-          decoration: InputDecoration(
-            counterText: '',
-            contentPadding: const EdgeInsets.all(0),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: borderColor, width: 1),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(
-                color: hasError
-                    ? O1SemanticColors.inputBorderError
-                    : O1SemanticColors.inputBorderFocus,
-                width: 2,
-              ),
-            ),
-            errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide:
-                  BorderSide(color: O1SemanticColors.inputBorderError, width: 1),
-            ),
-            focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide:
-                  BorderSide(color: O1SemanticColors.inputBorderError, width: 2),
-            ),
-            disabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide:
-                  BorderSide(color: O1SemanticColors.inputBorderDefault, width: 1),
-            ),
-            filled: true,
-            fillColor: !enabled
-                ? O1SemanticColors.inputBackgroundDisabled
-                : O1SemanticColors.inputBackgroundDefault,
-          ),
-          onChanged: onChanged,
-        ),
       ),
     );
   }
