@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../foundations/themes/semantic_colors.dart';
 
 /// Model for items in O1Select component
 ///
@@ -112,128 +111,123 @@ class O1Select<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final inputTheme = Theme.of(context).inputDecorationTheme;
+    final colorScheme = Theme.of(context).colorScheme;
 
-    // Build label text
-    String? labelText;
+    // Build label widget (separate from input, matching O1TextField)
+    Widget? labelWidget;
     if (label != null) {
-      labelText = required ? '$label *' : label;
+      // Determine label color based on state - use theme colors
+      final labelColor = !enabled
+          ? inputTheme.labelStyle?.color?.withValues(alpha: 0.5) ??
+              colorScheme.onSurface.withValues(alpha: 0.38)
+          : errorText != null
+              ? colorScheme.error
+              : inputTheme.labelStyle?.color ?? colorScheme.onSurface;
+
+      labelWidget = Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            label!,
+            style: inputTheme.labelStyle?.copyWith(color: labelColor),
+          ),
+          if (required) ...[
+            const SizedBox(width: 4),
+            Text(
+              '*',
+              style: inputTheme.labelStyle?.copyWith(
+                color: colorScheme.error,
+              ),
+            ),
+          ],
+        ],
+      );
     }
 
     return Opacity(
       opacity: enabled ? 1.0 : 0.5,
-      child: DropdownButtonFormField<T>(
-        value: value,
-        decoration: InputDecoration(
-          labelText: labelText,
-          labelStyle: inputTheme.labelStyle?.copyWith(
-            color: !enabled
-                ? O1SemanticColors.inputLabelDisabled
-                : errorText != null
-                    ? O1SemanticColors.inputLabelError
-                    : inputTheme.labelStyle?.color ??
-                        O1SemanticColors.inputLabelDefault,
-          ),
-          hintText: placeholder,
-          hintStyle: TextStyle(
-            fontSize: 14,
-            color: O1SemanticColors.inputTextPlaceholder,
-          ),
-          errorText: errorText,
-          errorStyle: inputTheme.errorStyle,
-          helperText: helperText,
-          helperStyle: inputTheme.helperStyle?.copyWith(
-            color: !enabled
-                ? O1SemanticColors.inputHelperTextDisabled
-                : O1SemanticColors.inputHelperTextDefault,
-          ),
-          filled: true,
-          fillColor: !enabled
-              ? O1SemanticColors.inputBackgroundDisabled
-              : O1SemanticColors.inputBackgroundDefault,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: BorderSide(
-              color: errorText != null
-                  ? O1SemanticColors.inputBorderError
-                  : O1SemanticColors.inputBorderDefault,
-              width: 1,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Label (outside of input, as per O1TextField pattern)
+          if (labelWidget != null) ...[labelWidget, const SizedBox(height: 12)],
+          // Select field
+          DropdownButtonFormField<T>(
+            value: value,
+            decoration: InputDecoration(
+              hintText: placeholder,
+              // Use theme hintStyle
+              hintStyle: inputTheme.hintStyle,
+              // Hide native error/helper text (show separately below)
+              errorText: errorText != null ? '' : null,
+              errorStyle: const TextStyle(height: 0, fontSize: 0),
+              helperText: null,
+              filled: true,
+              // Don't override fillColor - let theme handle it
+              // Only override if disabled to apply reduced opacity
+              fillColor: !enabled
+                  ? (inputTheme.fillColor ?? colorScheme.surface)
+                      .withValues(alpha: 0.5)
+                  : null,
+              // Don't specify borders - let theme handle them
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 14,
+              ),
             ),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: BorderSide(
-              color: errorText != null
-                  ? O1SemanticColors.inputBorderError
-                  : O1SemanticColors.inputBorderDefault,
-              width: 1,
-            ),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: BorderSide(
-              color: errorText != null
-                  ? O1SemanticColors.inputBorderError
-                  : O1SemanticColors.inputBorderFocus,
-              width: 1,
-            ),
-          ),
-          errorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: BorderSide(
-              color: O1SemanticColors.inputBorderError,
-              width: 1,
-            ),
-          ),
-          focusedErrorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: BorderSide(
-              color: O1SemanticColors.inputBorderError,
-              width: 1,
-            ),
-          ),
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 12,
-            vertical: 14,
-          ),
-        ),
-        items: items.map((item) {
-          return DropdownMenuItem<T>(
-            value: item.value,
-            enabled: item.enabled,
-            child: Row(
-              children: [
-                if (item.leading != null) ...[
-                  item.leading!,
-                  const SizedBox(width: 12),
-                ],
-                Expanded(
-                  child: Text(
-                    item.label,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: !item.enabled
-                          ? O1SemanticColors.textDisabled
-                          : O1SemanticColors.textPrimary,
+            items: items.map((item) {
+              return DropdownMenuItem<T>(
+                value: item.value,
+                enabled: item.enabled,
+                child: Row(
+                  children: [
+                    if (item.leading != null) ...[
+                      item.leading!,
+                      const SizedBox(width: 12),
+                    ],
+                    Expanded(
+                      child: Text(
+                        item.label,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: !item.enabled
+                              ? colorScheme.onSurface.withValues(alpha: 0.38)
+                              : colorScheme.onSurface,
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
-              ],
+              );
+            }).toList(),
+            onChanged: enabled ? onChanged : null,
+            isExpanded: true,
+            icon: Icon(
+              Icons.keyboard_arrow_down,
+              size: 20,
+              color: inputTheme.hintStyle?.color ??
+                  colorScheme.onSurface.withValues(alpha: 0.6),
             ),
-          );
-        }).toList(),
-        onChanged: enabled ? onChanged : null,
-        isExpanded: true,
-        icon: Icon(
-          Icons.keyboard_arrow_down,
-          size: 20,
-          color: O1SemanticColors.inputTextPlaceholder,
-        ),
-        dropdownColor: O1SemanticColors.surfaceCard,
-        menuMaxHeight: maxMenuHeight,
-        style: TextStyle(
-          fontSize: 14,
-          color: O1SemanticColors.inputTextDefault,
-        ),
+            dropdownColor: colorScheme.surface,
+            menuMaxHeight: maxMenuHeight,
+            style: TextStyle(
+              fontSize: 14,
+              color: colorScheme.onSurface,
+            ),
+          ),
+          // Helper/Error text (outside of input, matching O1TextField pattern)
+          if (errorText != null || helperText != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: errorText != null
+                  ? Text(errorText!, style: inputTheme.errorStyle)
+                  : Text(
+                      helperText!,
+                      style: inputTheme.helperStyle,
+                    ),
+            ),
+        ],
       ),
     );
   }

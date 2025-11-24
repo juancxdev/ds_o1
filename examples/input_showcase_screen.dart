@@ -90,7 +90,8 @@ class _InputShowcaseScreenState extends State<InputShowcaseScreen> {
                       ShowcaseNavItem(
                         title: 'States',
                         isSelected: _selectedSection == 'States',
-                        onTap: () => setState(() => _selectedSection = 'States'),
+                        onTap: () =>
+                            setState(() => _selectedSection = 'States'),
                       ),
                       const SizedBox(height: 8),
                       ShowcaseNavItem(
@@ -124,8 +125,9 @@ class _InputShowcaseScreenState extends State<InputShowcaseScreen> {
                       ShowcaseNavItem(
                         title: 'Select/Dropdown',
                         isSelected: _selectedSection == 'Select/Dropdown',
-                        onTap: () =>
-                            setState(() => _selectedSection = 'Select/Dropdown'),
+                        onTap: () => setState(
+                          () => _selectedSection = 'Select/Dropdown',
+                        ),
                       ),
                       const SizedBox(height: 44),
                       // Quick Reference Card
@@ -289,10 +291,7 @@ class _InputShowcaseScreenState extends State<InputShowcaseScreen> {
           previewChild: const Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              O1TextField(
-                label: 'Address',
-                placeholder: 'Enter your address',
-              ),
+              O1TextField(label: 'Address', placeholder: 'Enter your address'),
             ],
           ),
           code: 'O1TextField(\n  label: \'Address\',\n  enabled: true,\n)',
@@ -313,7 +312,8 @@ class _InputShowcaseScreenState extends State<InputShowcaseScreen> {
               ),
             ],
           ),
-          code: 'O1TextField(\n  label: \'Verified Email\',\n  enabled: false,\n)',
+          code:
+              'O1TextField(\n  label: \'Verified Email\',\n  enabled: false,\n)',
         ),
         const SizedBox(height: 24),
         ShowcaseCard(
@@ -347,7 +347,9 @@ class _InputShowcaseScreenState extends State<InputShowcaseScreen> {
                 placeholder: 'did:onlyone:123456789',
                 enabled: false,
                 helperText: 'This field cannot be modified',
-                controller: TextEditingController(text: 'did:onlyone:123456789'),
+                controller: TextEditingController(
+                  text: 'did:onlyone:123456789',
+                ),
               ),
             ],
           ),
@@ -389,7 +391,8 @@ class _InputShowcaseScreenState extends State<InputShowcaseScreen> {
               ),
             ],
           ),
-          code: 'O1TextField(\n  label: \'Email Address\',\n  required: true,\n)',
+          code:
+              'O1TextField(\n  label: \'Email Address\',\n  required: true,\n)',
         ),
       ],
     );
@@ -609,7 +612,8 @@ class _InputShowcaseScreenState extends State<InputShowcaseScreen> {
                                 ? Icons.visibility
                                 : Icons.visibility_off,
                             onPressed: () => setState(
-                                () => _obscurePassword = !_obscurePassword),
+                              () => _obscurePassword = !_obscurePassword,
+                            ),
                           ),
                         ),
                         const SizedBox(height: 24),
@@ -949,7 +953,7 @@ class _InputShowcaseScreenState extends State<InputShowcaseScreen> {
           description: 'Select showing validation error',
           spec: 'Border: Error',
           detail: 'Text: Error 600',
-          previewChild: const Column(
+          previewChild: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               O1Select<String>(
@@ -961,7 +965,7 @@ class _InputShowcaseScreenState extends State<InputShowcaseScreen> {
                   O1SelectItem(value: 'express', label: 'Express Shipping'),
                   O1SelectItem(value: 'overnight', label: 'Overnight'),
                 ],
-                onChanged: null,
+                onChanged: (value) {},
               ),
             ],
           ),

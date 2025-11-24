@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../foundations/themes/semantic_colors.dart';
 import '../../tokens/sizes.dart';
 import '../buttons/o1_button.dart';
 
@@ -28,13 +27,19 @@ class O1TextFieldPrefix {
     required String tooltip,
   }) {
     return O1TextFieldPrefix._(
-      widget: Tooltip(
-        message: tooltip,
-        child: Icon(
-          icon,
-          size: 20,
-          color: O1SemanticColors.inputTextPlaceholder,
-        ),
+      widget: Builder(
+        builder: (context) {
+          final theme = Theme.of(context);
+          return Tooltip(
+            message: tooltip,
+            child: Icon(
+              icon,
+              size: 20,
+              color: theme.inputDecorationTheme.hintStyle?.color ??
+                  theme.colorScheme.onSurface.withValues(alpha: 0.6),
+            ),
+          );
+        },
       ),
     );
   }
@@ -70,12 +75,18 @@ class O1TextFieldSuffix {
     required VoidCallback onPressed,
   }) {
     return O1TextFieldSuffix._(
-      widget: IconButton(
-        icon: Icon(icon, size: 20),
-        onPressed: onPressed,
-        padding: EdgeInsets.zero,
-        constraints: const BoxConstraints(),
-        color: O1SemanticColors.inputTextPlaceholder,
+      widget: Builder(
+        builder: (context) {
+          final theme = Theme.of(context);
+          return IconButton(
+            icon: Icon(icon, size: 20),
+            onPressed: onPressed,
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(),
+            color: theme.inputDecorationTheme.hintStyle?.color ??
+                theme.colorScheme.onSurface.withValues(alpha: 0.6),
+          );
+        },
       ),
     );
   }
@@ -229,16 +240,18 @@ class O1TextField extends StatelessWidget {
 
     // Get theme styles
     final inputTheme = Theme.of(context).inputDecorationTheme;
+    final colorScheme = Theme.of(context).colorScheme;
 
     // Build label widget (separate from input, as per Figma)
     Widget? labelWidget;
     if (label != null) {
-      // Determine label color based on state
+      // Determine label color based on state - use theme colors
       final labelColor = !enabled
-          ? O1SemanticColors.inputLabelDisabled
+          ? inputTheme.labelStyle?.color?.withValues(alpha: 0.5) ??
+              colorScheme.onSurface.withValues(alpha: 0.38)
           : errorText != null
-          ? O1SemanticColors.inputLabelError
-          : inputTheme.labelStyle?.color ?? O1SemanticColors.inputLabelDefault;
+              ? colorScheme.error
+              : inputTheme.labelStyle?.color ?? colorScheme.onSurface;
 
       labelWidget = Row(
         mainAxisSize: MainAxisSize.min,
@@ -252,7 +265,7 @@ class O1TextField extends StatelessWidget {
             Text(
               '*',
               style: inputTheme.labelStyle?.copyWith(
-                color: O1SemanticColors.inputRequiredIndicator,
+                color: colorScheme.error,
               ),
             ),
           ],
@@ -280,9 +293,10 @@ class O1TextField extends StatelessWidget {
             maxLines: obscureText ? 1 : maxLines,
             minLines: minLines,
             maxLength: maxLength,
-            style: Theme.of(
-              context,
-            ).textTheme.bodyMedium?.copyWith(fontSize: 14),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  fontSize: 14,
+                  color: colorScheme.onSurface,
+                ),
             decoration: InputDecoration(
               hintText: placeholder,
               suffixIcon: suffixWidget,
@@ -290,9 +304,12 @@ class O1TextField extends StatelessWidget {
                   ? const BoxConstraints()
                   : null,
               prefixIcon: prefixWidget,
+              // Don't override fillColor - let theme handle it
+              // Only override if disabled to apply reduced opacity
               fillColor: !enabled
-                  ? O1SemanticColors.inputBackgroundDisabled
-                  : O1SemanticColors.inputBackgroundDefault,
+                  ? (inputTheme.fillColor ?? colorScheme.surface)
+                      .withValues(alpha: 0.5)
+                  : null,
               constraints: maxLines == 1
                   ? BoxConstraints.tightFor(height: O1Sizes.inputHeight)
                   : BoxConstraints(minHeight: O1Sizes.inputHeight),
@@ -319,22 +336,14 @@ class O1TextField extends StatelessWidget {
                   else if (helperText != null)
                     Text(
                       helperText!,
-                      style: inputTheme.helperStyle?.copyWith(
-                        color: !enabled
-                            ? O1SemanticColors.inputHelperTextDisabled
-                            : O1SemanticColors.inputHelperTextDefault,
-                      ),
+                      style: inputTheme.helperStyle,
                     )
                   else
                     const SizedBox.shrink(),
                   if (maxLength != null)
                     Text(
                       '${controller?.text.length ?? 0}/$maxLength',
-                      style: inputTheme.helperStyle?.copyWith(
-                        color: !enabled
-                            ? O1SemanticColors.inputHelperTextDisabled
-                            : O1SemanticColors.inputHelperTextDefault,
-                      ),
+                      style: inputTheme.helperStyle,
                     ),
                 ],
               ),

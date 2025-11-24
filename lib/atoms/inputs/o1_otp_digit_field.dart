@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../../foundations/themes/semantic_colors.dart';
 import '../../tokens/sizes.dart';
 
 /// O1 Design System OTP Digit Field Atom
@@ -67,6 +66,7 @@ class O1OtpDigitField extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final inputTheme = theme.inputDecorationTheme;
+    final colorScheme = theme.colorScheme;
 
     return SizedBox(
       height: O1Sizes.inputHeight,
@@ -84,6 +84,7 @@ class O1OtpDigitField extends StatelessWidget {
           style: theme.textTheme.bodyMedium?.copyWith(
             fontSize: 24,
             fontWeight: FontWeight.w600,
+            color: colorScheme.onSurface,
           ),
           inputFormatters: [
             LengthLimitingTextInputFormatter(1),
@@ -103,9 +104,12 @@ class O1OtpDigitField extends StatelessWidget {
             focusedErrorBorder: inputTheme.focusedErrorBorder,
             disabledBorder: inputTheme.disabledBorder,
             filled: true,
+            // Don't override fillColor - let theme handle it
+            // Only override if disabled to apply reduced opacity
             fillColor: !enabled
-                ? O1SemanticColors.inputBackgroundDisabled
-                : O1SemanticColors.inputBackgroundDefault,
+                ? (inputTheme.fillColor ?? colorScheme.surface)
+                    .withValues(alpha: 0.5)
+                : null,
           ),
           onChanged: onChanged,
         ),
