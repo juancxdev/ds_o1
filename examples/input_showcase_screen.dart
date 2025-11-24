@@ -23,6 +23,12 @@ class _InputShowcaseScreenState extends State<InputShowcaseScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _searchController = TextEditingController();
 
+  // Select state variables
+  String? _selectedProduct;
+  String? _selectedCountry;
+  String? _selectedCategory;
+  String? _selectedCurrency;
+
   @override
   void dispose() {
     _emailController.dispose();
@@ -84,7 +90,8 @@ class _InputShowcaseScreenState extends State<InputShowcaseScreen> {
                       ShowcaseNavItem(
                         title: 'States',
                         isSelected: _selectedSection == 'States',
-                        onTap: () => setState(() => _selectedSection = 'States'),
+                        onTap: () =>
+                            setState(() => _selectedSection = 'States'),
                       ),
                       const SizedBox(height: 8),
                       ShowcaseNavItem(
@@ -113,6 +120,14 @@ class _InputShowcaseScreenState extends State<InputShowcaseScreen> {
                         isSelected: _selectedSection == 'OTP Input',
                         onTap: () =>
                             setState(() => _selectedSection = 'OTP Input'),
+                      ),
+                      const SizedBox(height: 8),
+                      ShowcaseNavItem(
+                        title: 'Select/Dropdown',
+                        isSelected: _selectedSection == 'Select/Dropdown',
+                        onTap: () => setState(
+                          () => _selectedSection = 'Select/Dropdown',
+                        ),
                       ),
                       const SizedBox(height: 44),
                       // Quick Reference Card
@@ -173,6 +188,9 @@ class _InputShowcaseScreenState extends State<InputShowcaseScreen> {
                     const SizedBox(height: 75),
                     // OTP Input Section
                     _buildOtpInputSection(),
+                    const SizedBox(height: 75),
+                    // Select/Dropdown Section
+                    _buildSelectSection(),
                   ],
                 ),
               ),
@@ -273,10 +291,7 @@ class _InputShowcaseScreenState extends State<InputShowcaseScreen> {
           previewChild: const Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              O1TextField(
-                label: 'Address',
-                placeholder: 'Enter your address',
-              ),
+              O1TextField(label: 'Address', placeholder: 'Enter your address'),
             ],
           ),
           code: 'O1TextField(\n  label: \'Address\',\n  enabled: true,\n)',
@@ -297,7 +312,8 @@ class _InputShowcaseScreenState extends State<InputShowcaseScreen> {
               ),
             ],
           ),
-          code: 'O1TextField(\n  label: \'Verified Email\',\n  enabled: false,\n)',
+          code:
+              'O1TextField(\n  label: \'Verified Email\',\n  enabled: false,\n)',
         ),
         const SizedBox(height: 24),
         ShowcaseCard(
@@ -331,7 +347,9 @@ class _InputShowcaseScreenState extends State<InputShowcaseScreen> {
                 placeholder: 'did:onlyone:123456789',
                 enabled: false,
                 helperText: 'This field cannot be modified',
-                controller: TextEditingController(text: 'did:onlyone:123456789'),
+                controller: TextEditingController(
+                  text: 'did:onlyone:123456789',
+                ),
               ),
             ],
           ),
@@ -373,7 +391,8 @@ class _InputShowcaseScreenState extends State<InputShowcaseScreen> {
               ),
             ],
           ),
-          code: 'O1TextField(\n  label: \'Email Address\',\n  required: true,\n)',
+          code:
+              'O1TextField(\n  label: \'Email Address\',\n  required: true,\n)',
         ),
       ],
     );
@@ -593,7 +612,8 @@ class _InputShowcaseScreenState extends State<InputShowcaseScreen> {
                                 ? Icons.visibility
                                 : Icons.visibility_off,
                             onPressed: () => setState(
-                                () => _obscurePassword = !_obscurePassword),
+                              () => _obscurePassword = !_obscurePassword,
+                            ),
                           ),
                         ),
                         const SizedBox(height: 24),
@@ -759,6 +779,259 @@ class _InputShowcaseScreenState extends State<InputShowcaseScreen> {
           ),
           code:
               'O1OtpInput(\n  length: 5,\n  label: \'Promo Code\',\n  keyboardType: TextInputType.text,\n  onCompleted: (code) {\n    applyPromoCode(code);\n  },\n)',
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSelectSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        O1Text(
+          'Select / Dropdown',
+          style: O1TextStyle.headlineMedium,
+          color: Theme.of(context).colorScheme.onSurface,
+        ),
+        const SizedBox(height: 24),
+        ShowcaseCard(
+          title: 'Basic Select',
+          description: 'Standard dropdown with label and placeholder',
+          spec: 'Height: 48px',
+          detail: 'Single selection',
+          previewChild: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              O1Select<String>(
+                label: 'Product',
+                placeholder: 'Select a product',
+                items: const [
+                  O1SelectItem(value: '1', label: 'Laptop'),
+                  O1SelectItem(value: '2', label: 'Mouse'),
+                  O1SelectItem(value: '3', label: 'Keyboard'),
+                  O1SelectItem(value: '4', label: 'Monitor'),
+                  O1SelectItem(value: '5', label: 'Headphones'),
+                ],
+                value: _selectedProduct,
+                onChanged: (value) => setState(() => _selectedProduct = value),
+              ),
+            ],
+          ),
+          code:
+              'O1Select<String>(\n  label: \'Product\',\n  placeholder: \'Select a product\',\n  items: [\n    O1SelectItem(value: \'1\', label: \'Laptop\'),\n    O1SelectItem(value: \'2\', label: \'Mouse\'),\n  ],\n  value: selectedValue,\n  onChanged: (value) => setState(() => selectedValue = value),\n)',
+        ),
+        const SizedBox(height: 24),
+        ShowcaseCard(
+          title: 'With Helper Text',
+          description: 'Select with additional context below',
+          spec: 'Helper: Gray 600',
+          detail: 'Font: 12px',
+          previewChild: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              O1Select<String>(
+                label: 'Country',
+                placeholder: 'Choose your country',
+                helperText: 'This will be used for shipping calculations',
+                items: const [
+                  O1SelectItem(value: 'us', label: 'United States'),
+                  O1SelectItem(value: 'ca', label: 'Canada'),
+                  O1SelectItem(value: 'mx', label: 'Mexico'),
+                  O1SelectItem(value: 'uk', label: 'United Kingdom'),
+                  O1SelectItem(value: 'de', label: 'Germany'),
+                ],
+                value: _selectedCountry,
+                onChanged: (value) => setState(() => _selectedCountry = value),
+              ),
+            ],
+          ),
+          code:
+              'O1Select<String>(\n  label: \'Country\',\n  placeholder: \'Choose your country\',\n  helperText: \'This will be used for shipping\',\n  items: [...],\n)',
+        ),
+        const SizedBox(height: 24),
+        ShowcaseCard(
+          title: 'Searchable Select',
+          description: 'Select with search functionality for long lists',
+          spec: 'Search: enabled',
+          detail: 'Filter: real-time',
+          previewChild: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              O1Select<String>(
+                label: 'Currency',
+                placeholder: 'Search and select currency',
+                searchable: true,
+                helperText: 'Type to search through available currencies',
+                items: const [
+                  O1SelectItem(value: 'usd', label: 'USD - US Dollar'),
+                  O1SelectItem(value: 'eur', label: 'EUR - Euro'),
+                  O1SelectItem(value: 'gbp', label: 'GBP - British Pound'),
+                  O1SelectItem(value: 'jpy', label: 'JPY - Japanese Yen'),
+                  O1SelectItem(value: 'cad', label: 'CAD - Canadian Dollar'),
+                  O1SelectItem(value: 'aud', label: 'AUD - Australian Dollar'),
+                  O1SelectItem(value: 'chf', label: 'CHF - Swiss Franc'),
+                  O1SelectItem(value: 'cny', label: 'CNY - Chinese Yuan'),
+                ],
+                value: _selectedCurrency,
+                onChanged: (value) => setState(() => _selectedCurrency = value),
+              ),
+            ],
+          ),
+          code:
+              'O1Select<String>(\n  label: \'Currency\',\n  searchable: true,\n  items: [...],\n)',
+        ),
+        const SizedBox(height: 24),
+        ShowcaseCard(
+          title: 'With Leading Icons',
+          description: 'Select items with custom leading widgets',
+          spec: 'Icon: 20px',
+          detail: 'Custom leading',
+          previewChild: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              O1Select<String>(
+                label: 'Category',
+                placeholder: 'Select a category',
+                items: const [
+                  O1SelectItem(
+                    value: 'electronics',
+                    label: 'Electronics',
+                    leading: Icon(Icons.devices, size: 20),
+                  ),
+                  O1SelectItem(
+                    value: 'clothing',
+                    label: 'Clothing',
+                    leading: Icon(Icons.checkroom, size: 20),
+                  ),
+                  O1SelectItem(
+                    value: 'books',
+                    label: 'Books',
+                    leading: Icon(Icons.menu_book, size: 20),
+                  ),
+                  O1SelectItem(
+                    value: 'home',
+                    label: 'Home & Garden',
+                    leading: Icon(Icons.home, size: 20),
+                  ),
+                ],
+                value: _selectedCategory,
+                onChanged: (value) => setState(() => _selectedCategory = value),
+              ),
+            ],
+          ),
+          code:
+              'O1Select<String>(\n  label: \'Category\',\n  items: [\n    O1SelectItem(\n      value: \'electronics\',\n      label: \'Electronics\',\n      leading: Icon(Icons.devices, size: 20),\n    ),\n  ],\n)',
+        ),
+        const SizedBox(height: 24),
+        ShowcaseCard(
+          title: 'Required Field',
+          description: 'Select with required indicator (red asterisk)',
+          spec: 'Indicator: Red 600',
+          detail: 'Label: 12px',
+          previewChild: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              O1Select<String>(
+                label: 'Payment Method',
+                placeholder: 'Choose payment method',
+                required: true,
+                items: const [
+                  O1SelectItem(value: 'card', label: 'Credit/Debit Card'),
+                  O1SelectItem(value: 'paypal', label: 'PayPal'),
+                  O1SelectItem(value: 'bank', label: 'Bank Transfer'),
+                ],
+                onChanged: (value) {},
+              ),
+            ],
+          ),
+          code:
+              'O1Select<String>(\n  label: \'Payment Method\',\n  required: true,\n  items: [...],\n)',
+        ),
+        const SizedBox(height: 24),
+        ShowcaseCard(
+          title: 'Error State',
+          description: 'Select showing validation error',
+          spec: 'Border: Error',
+          detail: 'Text: Error 600',
+          previewChild: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              O1Select<String>(
+                label: 'Shipping Method',
+                placeholder: 'Select shipping method',
+                errorText: 'Please select a shipping method',
+                items: [
+                  O1SelectItem(value: 'standard', label: 'Standard Shipping'),
+                  O1SelectItem(value: 'express', label: 'Express Shipping'),
+                  O1SelectItem(value: 'overnight', label: 'Overnight'),
+                ],
+                onChanged: (value) {},
+              ),
+            ],
+          ),
+          code:
+              'O1Select<String>(\n  label: \'Shipping Method\',\n  errorText: \'Please select a shipping method\',\n  items: [...],\n)',
+        ),
+        const SizedBox(height: 24),
+        ShowcaseCard(
+          title: 'Disabled State',
+          description: 'Select that cannot be interacted with',
+          spec: 'Opacity: 0.5',
+          detail: 'Interactive: false',
+          previewChild: const Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              O1Select<String>(
+                label: 'Account Type',
+                placeholder: 'Premium',
+                enabled: false,
+                helperText: 'Contact support to change account type',
+                items: [
+                  O1SelectItem(value: 'free', label: 'Free'),
+                  O1SelectItem(value: 'premium', label: 'Premium'),
+                  O1SelectItem(value: 'enterprise', label: 'Enterprise'),
+                ],
+                value: 'premium',
+                onChanged: null,
+              ),
+            ],
+          ),
+          code:
+              'O1Select<String>(\n  label: \'Account Type\',\n  enabled: false,\n  helperText: \'Contact support to change account type\',\n  items: [...],\n)',
+        ),
+        const SizedBox(height: 24),
+        ShowcaseCard(
+          title: 'Disabled Items',
+          description: 'Select with some items disabled',
+          spec: 'Item: disabled',
+          detail: 'Selectable: false',
+          previewChild: const Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              O1Select<String>(
+                label: 'Subscription Plan',
+                placeholder: 'Choose a plan',
+                helperText: 'Some plans are currently unavailable',
+                items: [
+                  O1SelectItem(value: 'basic', label: 'Basic - \$9/mo'),
+                  O1SelectItem(value: 'pro', label: 'Pro - \$29/mo'),
+                  O1SelectItem(
+                    value: 'business',
+                    label: 'Business - \$99/mo (Unavailable)',
+                    enabled: false,
+                  ),
+                  O1SelectItem(
+                    value: 'enterprise',
+                    label: 'Enterprise - Contact Us (Unavailable)',
+                    enabled: false,
+                  ),
+                ],
+                onChanged: null,
+              ),
+            ],
+          ),
+          code:
+              'O1Select<String>(\n  items: [\n    O1SelectItem(value: \'basic\', label: \'Basic\'),\n    O1SelectItem(\n      value: \'enterprise\',\n      label: \'Enterprise (Unavailable)\',\n      enabled: false,\n    ),\n  ],\n)',
         ),
       ],
     );

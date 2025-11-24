@@ -33,6 +33,7 @@ export 'foundations/themes/theme_extensions.dart';
 // Atoms
 export 'atoms/buttons/o1_button.dart';
 export 'atoms/inputs/o1_text_field.dart';
+export 'atoms/inputs/o1_select.dart';
 export 'atoms/texts/o1_text.dart';
 export 'atoms/icons/o1_icon.dart';
 
